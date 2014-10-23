@@ -1,0 +1,118 @@
+//
+//  Element.h
+//  TemplateLinkedList
+//
+//  Created by Max on 10/20/14.
+//  Copyright (c) 2014 Matz. All rights reserved.
+//
+
+#ifndef __TemplateLinkedList__Element__
+#define __TemplateLinkedList__Element__
+
+#include  <iostream>
+#include <assert.h>
+
+template < class T > class Element
+{
+    
+public:
+    Element< T >( );
+    Element< T >( const T& tValue );
+    
+    void setValue( const T& tValue );
+    T& getValue( );
+    
+    Element< T >* getPrevious( );
+    void setPrevious( Element< T >& ePrevious );
+    
+    Element< T >* getNext( );
+    void setNext( Element< T >& eNext );
+    
+    void attachBefore( Element< T >& eNext );
+    void detach( );
+    
+    ~Element( );
+    
+private:
+    
+    T _tValue;
+    
+    Element< T >* _eNext;
+    Element< T >* _ePrevious;
+    
+};
+
+template< class T > Element< T >::Element( ) :   _tValue( NULL ),
+                                                                        _eNext( nullptr ),
+                                                                        _ePrevious( nullptr )
+{
+    _eNext = this;
+    _ePrevious = this;
+}
+
+template< class T > Element< T >::Element( const T& tValue ) :      _tValue( tValue ),
+                                                                                                    _eNext( nullptr ),
+                                                                                                    _ePrevious( nullptr )
+{
+    _eNext = this;
+    _ePrevious = this;
+}
+
+template< class T > void Element< T >::setValue( const T& tValue )
+{
+    this->_tValue = tValue;
+}
+
+template< class T > T& Element< T >::getValue( )
+{
+    return _tValue;
+}
+
+template< class T > Element< T >* Element< T >::getPrevious( )
+{
+    return _ePrevious;
+}
+
+template< class T > void Element< T >::setPrevious( Element< T >& ePrevious )
+{
+    assert( &ePrevious != nullptr ); 
+    _ePrevious = &ePrevious;
+}
+
+template< class T > Element< T >* Element< T >::getNext( )
+{
+    return _eNext;
+}
+
+template< class T > void Element< T >::setNext( Element< T >& eNext )
+{
+    assert( &eNext != nullptr );
+    _eNext = &eNext;
+}
+
+template< class T > void Element< T >::attachBefore( Element< T >& eNext )
+{
+    assert( &eNext != nullptr );
+    
+    Element< T >& previous = *eNext.getPrevious( );
+    this->setNext( eNext );
+    this->setPrevious( previous );
+    
+    eNext.setPrevious( *this );
+    previous.setNext( *this );
+}
+
+template< class T > void Element< T >::detach( )
+{
+    _ePrevious->setNext( *_eNext );
+    _eNext->setPrevious( *_ePrevious );
+}
+
+template< class T > Element< T >::~Element( )
+{
+    _eNext = nullptr;
+    _ePrevious = nullptr;
+    _tValue = 0;
+}
+
+#endif /* defined(__TemplateLinkedList__Element__) */
