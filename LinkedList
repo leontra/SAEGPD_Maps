@@ -1,0 +1,184 @@
+//
+//  TemplateLinkedList.h
+//  TemplateLinkedList
+//
+//  Created by Max on 10/20/14.
+//  Copyright (c) 2014 Matz. All rights reserved.
+//
+
+#ifndef __TemplateLinkedList__TemplateLinkedList__
+#define __TemplateLinkedList__TemplateLinkedList__
+
+#include "Element.h"
+#include <exception>
+
+template< class T >  class LinkedList
+{
+    
+public:
+    LinkedList< T >( );
+    
+    void insert( const int& index, const T& tValue );
+    void add( const T& tValue );
+    
+    Element< T >* getElement( const int& index );
+    
+    T& get( const int& index );
+    T set( const int& index, const T& value );
+    
+    int indexOf( const T& tValue );
+    bool contains( const T& tValue );
+
+    T deleteObject( const int& index );
+    bool deleteValue( const T& tValue );
+    
+    const int& size( );
+    bool isEmpty( );
+
+    void clear( );
+    
+    ~LinkedList< T >( );
+    
+private:
+
+    Element< T >* _headAndTail;
+    int _iSize;
+    
+};
+
+template< class T > LinkedList< T >::LinkedList( ) : _iSize( NULL ),
+                                                                            _headAndTail( nullptr )
+{
+    _headAndTail = new Element< T >( );
+}
+
+template< class T > void LinkedList< T >::insert( const int& index, const T& tValue )
+{
+    assert( &tValue  != nullptr  );
+    
+    if( index < 0 || index > _iSize ) throw std::out_of_range( " The index is out of range" );
+    
+    Element< T >* element = new Element< T >( tValue );
+    
+    element->attachBefore( *this->getElement( index ) );
+    
+    ++this->_iSize;
+}
+
+template< class T > Element< T >* LinkedList< T >::getElement( const int& index )
+{
+    Element< T >* element = _headAndTail->getNext( );
+    for( int i = index; i > 0; --i )
+    {
+        element = element->getNext( );
+    }
+    return element;
+}
+
+template< class T > T& LinkedList< T >::get( const int& index )
+{
+    assert( index < _iSize );
+    return this->getElement( index )->getValue( );
+}
+
+template< class T > LinkedList< T >::~LinkedList( )
+{
+    this->_iSize = 0;
+}
+
+template< class T > void LinkedList< T >::add( const T& tValue )
+{
+    this->insert( _iSize, tValue );
+}
+
+template< class T > T LinkedList< T >::set( const int& index, const T& tValue )
+{
+    assert( &tValue != nullptr );
+    Element< T >* element = this->getElement( index );
+    T tOldValue = element->getValue( );
+    element->setValue( tValue );
+    return tOldValue;
+}
+
+template< class T > int LinkedList< T >::indexOf( const T& tValue )
+{
+    assert( &tValue != nullptr );
+    int index = 0;
+    Element< T >* elem = nullptr;
+    
+    for( elem = _headAndTail->getNext( ); elem != _headAndTail; elem = elem->getNext( ) )
+    {
+        if( tValue == elem->getValue( ) )
+            return index;
+        
+        ++index;
+    }
+    
+    return -1;
+}
+
+template< class T > bool LinkedList< T >::contains( const T& tValue )
+{
+    return this->indexOf( tValue ) != -1;
+}
+
+template< class T > T LinkedList< T >::deleteObject( const int& index )
+{
+    Element< T >* element = this->getElement( index );
+    element->detach( );
+    T tValue = element->getValue( );
+    delete element;
+    --_iSize;
+    return tValue;
+}
+
+template< class T > bool LinkedList< T >::deleteValue( const T& tValue )
+{
+    assert( &tValue != nullptr );
+    
+    for(  Element< T >* elem = _headAndTail->getNext( );
+                                  elem != _headAndTail;
+                                  elem = elem->getNext( )
+         )
+    {
+        if( tValue == elem->getValue( ) )
+        {
+            elem->detach( );
+            delete elem;
+            --this->_iSize;
+            return 1;
+        }
+        
+    }
+    return 0;
+}
+
+template< class T > const int& LinkedList< T >::size( )
+{
+    return _iSize;
+}
+
+template< class T > bool LinkedList< T >::isEmpty( )
+{
+    return this->size( ) <= 0 ? 1 : 0;
+}
+
+template< class T > void LinkedList< T >::clear( )
+{
+    Element< T >* element = _headAndTail->getNext( );
+    
+    for( int i = _iSize; i > 0; --i )
+    {
+        Element< T >* elem = element;
+        element = element->getNext( );
+        delete elem;
+    }
+    
+    this->_headAndTail->setPrevious( *_headAndTail );
+    this->_headAndTail->setNext( *_headAndTail );
+    this->_iSize = 0;
+}
+
+
+
+#endif /* defined(__TemplateLinkedList__TemplateLinkedList__) */
